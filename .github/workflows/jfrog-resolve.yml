@@ -41,12 +41,12 @@ jobs:
       - name: Configure Maven with JFrog
         run: |
           jf mvn-config \
-            --server-id-resolve my-server \
-            --server-id-deploy my-server \
-            --repo-resolve-releases releases-repo \
-            --repo-resolve-snapshots snapshots-repo \
-            --repo-deploy-releases releases-repo \
-            --repo-deploy-snapshots snapshots-repo
+             --server-id-resolve my-server \
+             --server-id-deploy my-server \
+             --repo-resolve-releases maven-virtual \
+             --repo-resolve-snapshots maven-virtual \
+             --repo-deploy-releases releases-repo \
+             --repo-deploy-snapshots snapshots-repo
 
       - name: Resolve dependencies via JFrog Artifactory
         run: |
