@@ -7,10 +7,12 @@ jobs:
   resolve-dependencies:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: List all environment variables
-        run: env
+    # Make secrets available to every step in the job
+    env:
+      JF_URL: ${{ secrets.JF_URL }}
+      JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
 
+    steps:
       - name: Check out spring-petclinic
         uses: actions/checkout@v4
         with:
@@ -25,24 +27,54 @@ jobs:
 
       - name: Configure JFrog CLI
         uses: jfrog/setup-jfrog-cli@v4
-        env:
-          JF_URL: ${{ secrets.JF_URL }}
-          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
 
-      - name: Debug JFrog env vars
+      - name: Debug JFrog env vars (masked)
         run: |
-          echo "JF_URL: $JF_URL"
+          # Print masked presence and lengths only
+          echo "JF_URL length: ${#JF_URL}"
           echo "JF_ACCESS_TOKEN length: ${#JF_ACCESS_TOKEN}"
 
-      - name: Configure JFrog server
+      - name: Validate JF_URL and JF_ACCESS_TOKEN
         run: |
+          set -euo pipefail
+
+          # Trim CR/LF that may have been accidentally included when the secret was created
+          CLEAN_JF_URL="$(printf '%s' "$JF_URL" | tr -d '\r\n')"
+          CLEAN_JF_TOKEN="$(printf '%s' "$JF_ACCESS_TOKEN" | tr -d '\r\n')"
+
+          # Basic checks
+          if [ -z "$CLEAN_JF_URL" ]; then
+            echo "Error: JF_URL is empty after trimming. Check repository secrets."
+            exit 1
+          fi
+
+          if [ -z "$CLEAN_JF_TOKEN" ]; then
+            echo "Error: JF_ACCESS_TOKEN is empty after trimming. Check repository secrets."
+            exit 1
+          fi
+
+          # Ensure URL looks like an Artifactory URL
+          if ! printf '%s' "$CLEAN_JF_URL" | grep -E -q '^https?://'; then
+            echo "Error: JF_URL does not start with http(s)://"
+            exit 1
+          fi
+
+          # Export cleaned values for subsequent run steps in this shell
+          echo "CLEAN_JF_URL=$CLEAN_JF_URL" >> "$GITHUB_ENV"
+          echo "CLEAN_JF_TOKEN=$CLEAN_JF_TOKEN" >> "$GITHUB_ENV"
+
+      - name: Configure JFrog server (use cleaned values)
+        run: |
+          set -euo pipefail
+          # Use the cleaned values from GITHUB_ENV
           jf c add my-server \
-            --url "$JF_URL" \
-            --access-token "$JF_ACCESS_TOKEN" \
+            --url "$CLEAN_JF_URL" \
+            --access-token "$CLEAN_JF_TOKEN" \
             --interactive=false
 
       - name: Configure Maven with JFrog
         run: |
+          set -euo pipefail
           jf mvn-config \
              --server-id-resolve my-server \
              --server-id-deploy my-server \
@@ -50,11 +82,14 @@ jobs:
              --repo-resolve-snapshots maven-virtual \
              --repo-deploy-releases releases-repo \
              --repo-deploy-snapshots snapshots-repo
-             
-      - name: Debug Maven repo URL
+
+      - name: Debug Maven repo URL (masked)
         run: |
-          echo "Repo URL should be: $JF_URL/artifactory/maven-virtual"
+          # Show the repo suffix only; full URL is masked by GitHub if secret is present
+          echo "Repo suffix: /artifactory/maven-virtual"
+          echo "Full repo (masked): $CLEAN_JF_URL/artifactory/maven-virtual"
 
       - name: Resolve dependencies via JFrog Artifactory
         run: |
+          set -euo pipefail
           jf mvn dependency:resolve
