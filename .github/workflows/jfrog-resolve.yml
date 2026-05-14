@@ -31,9 +31,18 @@ jobs:
           echo "JF_URL: $JF_URL"
           echo "JF_ACCESS_TOKEN length: ${#JF_ACCESS_TOKEN}"
 
+      - name: Configure JFrog server
+        run: |
+          jf c add my-server \
+            --url $JF_URL \
+            --access-token $JF_ACCESS_TOKEN \
+            --interactive=false
+
       - name: Configure Maven with JFrog
         run: |
           jf mvn-config \
+            --server-id-resolve my-server \
+            --server-id-deploy my-server \
             --repo-resolve-releases releases-repo \
             --repo-resolve-snapshots snapshots-repo \
             --repo-deploy-releases releases-repo \
