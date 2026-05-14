@@ -1,0 +1,35 @@
+name: Manual JFrog Resolve
+
+on:
+  workflow_dispatch:
+
+jobs:
+  resolve-dependencies:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out spring-petclinic
+        uses: actions/checkout@v4
+        with:
+          repository: comedymoment/spring-petclinic
+          fetch-depth: 0
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Configure JFrog CLI
+        uses: jfrog/setup-jfrog-cli@v4
+        env:
+          JF_URL: ${{ secrets.JF_URL }}
+          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+
+      - name: Configure Maven with JFrog
+        run: |
+          jf mvnc --repo-resolve snapshots-repo --repo-deploy releases-repo
+
+      - name: Resolve dependencies via JFrog Artifactory
+        run: |
+          jf mvn dependency:resolve
