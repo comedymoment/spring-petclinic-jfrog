@@ -1,0 +1,18 @@
+name: Manual Checkout External Repo
+
+on:
+  workflow_dispatch:
+
+jobs:
+  checkout-external:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out spring-petclinic
+        uses: actions/checkout@v4
+        with:
+          repository: comedymoment/spring-petclinic
+          fetch-depth: 0
+
+      - name: List files
+        run: ls -R
