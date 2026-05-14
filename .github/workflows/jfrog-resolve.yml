@@ -8,6 +8,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: List all environment variables
+        run: env
+
       - name: Check out spring-petclinic
         uses: actions/checkout@v4
         with:
