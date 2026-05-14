@@ -34,7 +34,7 @@ jobs:
       - name: Configure JFrog server
         run: |
           jf c add my-server \
-            --url $JF_URL \
+            --url $JF_URL/artifactory \
             --access-token $JF_ACCESS_TOKEN \
             --interactive=false
 
@@ -47,6 +47,10 @@ jobs:
              --repo-resolve-snapshots maven-virtual \
              --repo-deploy-releases releases-repo \
              --repo-deploy-snapshots snapshots-repo
+             
+      - name: Debug Maven repo URL
+        run: |
+          echo "Repo URL should be: $JF_URL/artifactory/maven-virtual"
 
       - name: Resolve dependencies via JFrog Artifactory
         run: |
