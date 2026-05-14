@@ -33,7 +33,11 @@ jobs:
 
       - name: Configure Maven with JFrog
         run: |
-          jf mvnc --repo-resolve snapshots-repo --repo-deploy releases-repo
+          jf mvn-config \
+            --repo-resolve-releases releases-repo \
+            --repo-resolve-snapshots snapshots-repo \
+            --repo-deploy-releases releases-repo \
+            --repo-deploy-snapshots snapshots-repo
 
       - name: Resolve dependencies via JFrog Artifactory
         run: |
