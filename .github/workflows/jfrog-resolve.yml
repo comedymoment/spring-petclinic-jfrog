@@ -34,7 +34,7 @@ jobs:
       - name: Configure JFrog server
         run: |
           jf c add my-server \
-            --url "$JF_URL/artifactory" \
+            --url "$JF_URL" \
             --access-token "$JF_ACCESS_TOKEN" \
             --interactive=false
 
