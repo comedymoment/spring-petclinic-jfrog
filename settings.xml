@@ -5,7 +5,7 @@
 
   <servers>
     <server>
-      <id>jfrog-artifactory</id>
+      <id>central</id>
       <username>${env.JF_USER}</username>
       <password>${env.JF_PASSWORD}</password>
     </server>
@@ -13,7 +13,7 @@
 
   <mirrors>
     <mirror>
-      <id>jfrog-artifactory</id>
+      <id>central</id>
       <mirrorOf>*</mirrorOf>
       <url>${env.JF_URL}/artifactory/uk1-maven-virtual</url>
     </mirror>
@@ -24,13 +24,13 @@
       <id>jfrog</id>
       <repositories>
         <repository>
-          <id>jfrog-artifactory</id>
+          <id>central</id>
           <url>${env.JF_URL}/artifactory/uk1-maven-virtual</url>
         </repository>
       </repositories>
       <pluginRepositories>
         <pluginRepository>
-          <id>jfrog-artifactory</id>
+          <id>central</id>
           <url>${env.JF_URL}/artifactory/uk1-maven-virtual</url>
         </pluginRepository>
       </pluginRepositories>
