@@ -35,12 +35,13 @@ jobs:
             --interactive=false \
             --overwrite=true
 
-      - name: Configure Maven with JFrog
+      - name: Configure Maven for JFrog
         run: |
           jf mvn-config \
             --server-id-resolve my-server \
             --repo-resolve-releases maven-virtual \
-            --repo-resolve-snapshots maven-virtual
+            --repo-resolve-snapshots maven-virtual \
+            --use-wrapper=false
 
       - name: Resolve dependencies via JFrog Artifactory
         run: |
