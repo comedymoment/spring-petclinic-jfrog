@@ -19,11 +19,10 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Install JFrog CLI (full version)
+      - name: Install JFrog CLI (thin version)
         run: |
-          curl -fL https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/latest/jf-linux-amd64/jf -o jf
-          chmod +x jf
-          sudo mv jf /usr/local/bin/
+          curl -fL https://getcli.jfrog.io | sh
+          sudo mv jfrog /usr/local/bin/jf
 
       - name: Configure JFrog CLI
         run: |
@@ -41,9 +40,3 @@ jobs:
           jf rt upload "target/*.jar" \
             "libs-release-local/spring-petclinic/${{ github.run_number }}/" \
             --flat=true
-
-      - name: Xray Scan the Artifact
-        run: |
-          jf xr scan \
-            "libs-release-local/spring-petclinic/${{ github.run_number }}/" \
-            --fail=false
