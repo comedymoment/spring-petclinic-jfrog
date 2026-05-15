@@ -103,3 +103,6 @@ jobs:
           jf xr scan target/*.jar --watches "*" --fail=false
 
       # 4. Publish artifact to JFrog
+      - name: Upload artifact to Artifactory
+        run: |
+          jf rt u "target/*.jar" "uk1-generic-local/"
