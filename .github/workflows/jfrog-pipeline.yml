@@ -98,9 +98,13 @@ jobs:
             --interactive=false
 
       # 3. Scan the artifact with Xray
+
+      
+      - name: Install Xray plugin
+        run: jf plugin install xray
+        
       - name: Xray Scan
-        run: |
-          jf xr scan target/*.jar --watches "*" --fail=false
+        run: jf xray scan target/*.jar --fail=false
 
       # 4. Publish artifact to JFrog
       - name: Upload artifact to Artifactory
