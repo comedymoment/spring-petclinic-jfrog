@@ -40,3 +40,9 @@ jobs:
           jf rt upload "target/*.jar" \
             "libs-release-local/spring-petclinic/${{ github.run_number }}/" \
             --flat=true
+
+      - name: Xray Scan the Artifact
+        run: |
+          jf xr scan \
+            "libs-release-local/spring-petclinic/${{ github.run_number }}/" \
+            --fail=false
