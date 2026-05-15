@@ -32,6 +32,12 @@ jobs:
             --password="${{ secrets.JF_PASSWORD }}" \
             --interactive=false
 
+      - name: Export JFrog environment variables for Maven
+        run: |
+          echo "JF_URL=${{ secrets.JF_URL }}" >> $GITHUB_ENV
+          echo "JF_USER=${{ secrets.JF_USER }}" >> $GITHUB_ENV
+          echo "JF_PASSWORD=${{ secrets.JF_PASSWORD }}" >> $GITHUB_ENV
+
       - name: Build with Maven (using JFrog virtual repo)
         run: mvn clean package -s settings.xml
 
