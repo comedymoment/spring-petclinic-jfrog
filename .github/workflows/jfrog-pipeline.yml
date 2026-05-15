@@ -80,7 +80,7 @@ jobs:
 
       # 3. Install FULL JFrog CLI (with Xray support)
       - name: Install JFrog CLI
-        run: brew install jfrog-cli
+        uses: jfrog/setup-jfrog-cli@v4
 
       # Configure JFrog CLI
       - name: Configure JFrog CLI
