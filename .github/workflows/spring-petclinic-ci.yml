@@ -19,10 +19,11 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Install JFrog CLI
+      - name: Install JFrog CLI (full version)
         run: |
-          curl -fL https://getcli.jfrog.io | sh
-          sudo mv jfrog /usr/local/bin/jf
+          curl -fL https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/latest/jf-linux-amd64/jf -o jf
+          chmod +x jf
+          sudo mv jf /usr/local/bin/
 
       - name: Configure JFrog CLI
         run: |
@@ -33,8 +34,7 @@ jobs:
             --interactive=false
 
       - name: Build with Maven (using JFrog virtual repo)
-        run: |
-          jf mvn clean package -s settings.xml
+        run: mvn clean package -s settings.xml
 
       - name: Upload JAR to Artifactory
         run: |
