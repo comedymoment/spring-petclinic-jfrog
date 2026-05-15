@@ -1,48 +1,104 @@
-name: Manual JFrog Resolve
+name: JFrog CI Pipeline
 
 on:
   workflow_dispatch:
+  pull_request:
 
 jobs:
-  resolve-dependencies:
+  build:
     runs-on: ubuntu-latest
 
-    env:
-      JF_URL: ${{ secrets.JF_URL }}
-      JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
-
     steps:
-      - name: Check out spring-petclinic-jfrog
+      # 1. Checkout source code
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          repository: comedymoment/spring-petclinic-jfrog
-          fetch-depth: 0
 
+      # Install Java
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
+      # Export JFrog environment variables
+      - name: Export JFrog environment variables
+        run: |
+          echo "JF_URL=${{ secrets.JF_URL }}" >> $GITHUB_ENV
+          echo "JF_USER=${{ secrets.JF_USER }}" >> $GITHUB_ENV
+          echo "JF_PASSWORD=${{ secrets.JF_PASSWORD }}" >> $GITHUB_ENV
+
+      # 2. Configure Maven to resolve dependencies through JFrog
+      - name: Create Maven settings.xml
+        run: |
+          mkdir -p ~/.m2
+          cat << 'EOF' > ~/.m2/settings.xml
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                                        https://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+            <servers>
+              <server>
+                <id>jfrog-artifactory</id>
+                <username>${env.JF_USER}</username>
+                <password>${env.JF_PASSWORD}</password>
+              </server>
+            </servers>
+
+            <mirrors>
+              <mirror>
+                <id>jfrog-artifactory</id>
+                <mirrorOf>*</mirrorOf>
+                <url>${env.JF_URL}/artifactory/uk1-maven-virtual</url>
+              </mirror>
+            </mirrors>
+
+            <profiles>
+              <profile>
+                <id>jfrog</id>
+                <repositories>
+                  <repository>
+                    <id>jfrog-artifactory</id>
+                    <url>${env.JF_URL}/artifactory/uk1-maven-virtual</url>
+                  </repository>
+                </repositories>
+                <pluginRepositories>
+                  <pluginRepository>
+                    <id>jfrog-artifactory</id>
+                    <url>${env.JF_URL}/artifactory/uk1-maven-virtual</url>
+                  </pluginRepository>
+                </pluginRepositories>
+              </profile>
+            </profiles>
+
+            <activeProfiles>
+              <activeProfile>jfrog</activeProfile>
+            </activeProfiles>
+
+          </settings>
+          EOF
+
+      # 3. Install FULL JFrog CLI (with Xray support)
       - name: Install JFrog CLI
-        uses: jfrog/setup-jfrog-cli@v4
+        run: brew install jfrog-cli
 
-      - name: Configure JFrog CLI (Access Token)
+      # Configure JFrog CLI
+      - name: Configure JFrog CLI
         run: |
-          jf c add my-server \
-            --url "$JF_URL" \
-            --access-token "$JF_ACCESS_TOKEN" \
-            --interactive=false \
-            --overwrite=true
+          jf c add jfrog-server \
+            --url="${JF_URL}" \
+            --user="${JF_USER}" \
+            --password="${JF_PASSWORD}" \
+            --interactive=false
 
-      - name: Configure Maven for JFrog
-        run: |
-          jf mvn-config \
-            --server-id-resolve=my-server \
-            --repo-resolve-releases=maven-virtual \
-            --repo-resolve-snapshots=maven-virtual \
-            --use-wrapper=false
+      # 4. Build the project (dependencies resolved through JFrog)
+      - name: Build with Maven
+        run: mvn -B clean package
 
-      - name: Resolve dependencies (plain Maven, no extractor)
-        run: |
-          mvn dependency:resolve -X
+      # 5. Xray Scan
+      - name: Xray Scan
+        run: jf xr scan target/*.jar --fail=false
+
+      # 6. Publish artifact to JFrog
+      - name: Upload artifact to Artifactory
+        run: jf rt u "target/*.jar" "uk1-generic-local/"
