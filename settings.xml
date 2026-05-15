@@ -1,0 +1,7 @@
+spring-petclinic-jfrog/
+  settings.xml   ← this file goes here
+  pom.xml
+  src/
+  .github/
+    workflows/
+      spring-petclinic-ci.yml
