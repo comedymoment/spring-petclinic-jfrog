@@ -95,9 +95,9 @@ jobs:
       - name: Build with Maven
         run: mvn -B clean package
 
-      # 5. Xray Scan
+      # 5. Xray Scan (security + licenses only)
       - name: Xray Scan
-        run: jf xr scan target/*.jar --fail=false
+        run: jf scan target/*.jar --fail=false --scanners "security,licenses"
 
       # 6. Publish artifact to JFrog
       - name: Upload artifact to Artifactory
