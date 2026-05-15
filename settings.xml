@@ -1,7 +1,48 @@
-spring-petclinic-jfrog/
-  settings.xml   ← this file goes here
-  pom.xml
-  src/
-  .github/
-    workflows/
-      spring-petclinic-ci.yml
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                              https://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+  <servers>
+    <server>
+      <id>jfrog-maven</id>
+      <username>${env.JF_USER}</username>
+      <password>${env.JF_PASSWORD}</password>
+    </server>
+  </servers>
+
+  <mirrors>
+    <mirror>
+      <id>jfrog-maven-mirror</id>
+      <mirrorOf>*</mirrorOf>
+      <url>${env.JF_URL}/artifactory/maven-virtual</url>
+    </mirror>
+  </mirrors>
+
+  <profiles>
+    <profile>
+      <id>jfrog</id>
+      <repositories>
+        <repository>
+          <id>jfrog-maven</id>
+          <url>${env.JF_URL}/artifactory/maven-virtual</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+      </repositories>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>jfrog-maven-plugins</id>
+          <url>${env.JF_URL}/artifactory/maven-virtual</url>
+          <releases><enabled>true</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
+
+  <activeProfiles>
+    <activeProfile>jfrog</activeProfile>
+  </activeProfiles>
+
+</settings>
