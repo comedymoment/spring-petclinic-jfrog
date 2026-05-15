@@ -78,12 +78,9 @@ jobs:
           </settings>
           EOF
 
-      # 3. Install FULL JFrog CLI (includes Xray support)
-      - name: Install full JFrog CLI
-        run: |
-          curl -fL https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/latest/jf-linux-amd64/jf -o jf
-          chmod +x jf
-          sudo mv jf /usr/local/bin/jf
+      # 3. Install FULL JFrog CLI (with Xray support)
+      - name: Install JFrog CLI
+        run: brew install jfrog-cli
 
       # Configure JFrog CLI
       - name: Configure JFrog CLI
