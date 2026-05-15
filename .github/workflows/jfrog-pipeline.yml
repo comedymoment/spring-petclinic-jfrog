@@ -78,15 +78,12 @@ jobs:
           </settings>
           EOF
 
-      # Build the project (dependencies resolved through JFrog)
-      - name: Build with Maven
-        run: mvn -B clean package
-
-      # Install JFrog CLI
-      - name: Install JFrog CLI
+      # 3. Install FULL JFrog CLI (includes Xray support)
+      - name: Install full JFrog CLI
         run: |
-          curl -fL https://getcli.jfrog.io | sh
-          sudo mv jfrog /usr/local/bin/jf
+          curl -fL https://releases.jfrog.io/artifactory/jfrog-cli/v2-jf/latest/jf-linux-amd64/jf -o jf
+          chmod +x jf
+          sudo mv jf /usr/local/bin/jf
 
       # Configure JFrog CLI
       - name: Configure JFrog CLI
@@ -97,16 +94,14 @@ jobs:
             --password="${JF_PASSWORD}" \
             --interactive=false
 
-      # 3. Scan the artifact with Xray
+      # 4. Build the project (dependencies resolved through JFrog)
+      - name: Build with Maven
+        run: mvn -B clean package
 
-      
-      - name: Install Xray plugin
-        run: jf plugin install xray
-        
+      # 5. Xray Scan
       - name: Xray Scan
-        run: jf xray scan target/*.jar --fail=false
+        run: jf xr scan target/*.jar --fail=false
 
-      # 4. Publish artifact to JFrog
+      # 6. Publish artifact to JFrog
       - name: Upload artifact to Artifactory
-        run: |
-          jf rt u "target/*.jar" "uk1-generic-local/"
+        run: jf rt u "target/*.jar" "uk1-generic-local/"
