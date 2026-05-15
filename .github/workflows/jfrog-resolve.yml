@@ -55,7 +55,9 @@ jobs:
             --server-id-resolve my-server \
             --server-id-deploy my-server \
             --repo-resolve-releases maven-virtual \
-            --repo-resolve-snapshots maven-virtual
+            --repo-resolve-snapshots maven-virtual \
+            --repo-deploy-releases libs-release-local \
+            --repo-deploy-snapshots libs-snapshot-local
 
       - name: Resolve dependencies via JFrog Artifactory
         run: |
