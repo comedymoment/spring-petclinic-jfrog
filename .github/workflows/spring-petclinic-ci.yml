@@ -47,30 +47,31 @@ jobs:
             --access-token "$JF_ACCESS_TOKEN" \
             --interactive=false \
             --overwrite=true
-
+            
       # 5. Configure Maven to resolve ONLY through JFrog (virtual repo)
       - name: Configure Maven for JFrog
         run: |
           jf mvn-config \
             --server-id-resolve=my-server \
+            --server-id-deploy=my-server \
             --repo-resolve-releases="$JF_MAVEN_VIRTUAL" \
             --repo-resolve-snapshots="$JF_MAVEN_VIRTUAL" \
+            --repo-deploy-releases="$JF_MAVEN_RELEASES" \
+            --repo-deploy-snapshots="$JF_MAVEN_SNAPSHOTS" \
             --use-wrapper=false
 
       # 6. Resolve dependencies and build the artifact (JAR) via JFrog
-      #    Maven uses the settings.xml generated above, so all deps go through Artifactory.
-      - name: Build with Maven (resolve via JFrog)
+      #    This also attaches artifacts + dependencies to build-info
+      - name: Build with Maven via JFrog
         run: |
-          mvn -B clean package
+          jf mvn clean package \
+            --build-name=$JF_BUILD_NAME \
+            --build-number=$JF_BUILD_NUMBER
 
-      # 7. Upload the resulting JAR to Artifactory
-      #    This publishes the artifact to your chosen release repo.
-      - name: Publish JAR to JFrog Artifactory
+      # 7. Publish build-info to Artifactory (CRITICAL for Xray)
+      - name: Publish build-info
         run: |
-          # Adjust the pattern if your artifact name changes
-          jf rt upload "target/*.jar" "$JF_MAVEN_RELEASES/spring-petclinic/${JF_BUILD_NUMBER}/" \
-            --build-name="$JF_BUILD_NAME" \
-            --build-number="$JF_BUILD_NUMBER"
+          jf rt build-publish $JF_BUILD_NAME $JF_BUILD_NUMBER
 
       # 8. Scan build with Xray
       - name: Xray scan build
