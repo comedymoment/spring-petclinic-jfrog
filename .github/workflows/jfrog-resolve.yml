@@ -1,4 +1,4 @@
-name: JFrog CI Pipeline
+name: JFrog Resolve
 
 on:
   workflow_dispatch:
