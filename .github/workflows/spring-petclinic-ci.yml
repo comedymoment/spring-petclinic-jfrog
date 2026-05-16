@@ -75,4 +75,4 @@ jobs:
       # 8. Scan build with Xray
       - name: Xray scan build
         run: |
-          jf rt build-scan $JF_BUILD_NAME $JF_BUILD_NUMBER --fail=false
+          jf build-scan $JF_BUILD_NAME $JF_BUILD_NUMBER --fail=false
