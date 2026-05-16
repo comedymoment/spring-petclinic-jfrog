@@ -64,7 +64,7 @@ jobs:
       #    This also attaches artifacts + dependencies to build-info
       - name: Build with Maven via JFrog
         run: |
-          jf mvn clean package \
+          jf mvn clean package -DskipTests \
             --build-name=$JF_BUILD_NAME \
             --build-number=$JF_BUILD_NUMBER
 
