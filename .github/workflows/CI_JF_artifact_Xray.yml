@@ -73,17 +73,7 @@ jobs:
             --build-name="$JF_BUILD_NAME" \
             --build-number="$JF_BUILD_NUMBER"
 
-      # 8. Collect environment and VCS info into the build-info
-      - name: Collect build environment for build-info
-        run: |
-          jf rt build-collect-env "$JF_BUILD_NAME" "$JF_BUILD_NUMBER"
-
-      # 9. Publish build-info to Artifactory (so Xray can see it)
-      - name: Publish build-info to JFrog
-        run: |
-          jf rt build-publish "$JF_BUILD_NAME" "$JF_BUILD_NUMBER"
-
-      # 10. Scan the build with Xray
+      # 8. Scan the build with Xray
       #     This assumes the repos are indexed in Xray and watches/policies are configured.
       #     --fail=false ensures the pipeline does NOT fail on vulnerabilities (per assignment).
       - name: Xray scan build
