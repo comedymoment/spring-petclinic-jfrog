@@ -9,46 +9,55 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      JF_BUILD_NAME: spring-petclinic-ci
+      JF_BUILD_NUMBER: ${{ github.run_number }}
+
     steps:
+      # 1. Checkout source code
       - name: Checkout source
         uses: actions/checkout@v4
 
+      # 2. Set up Java
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Install JFrog CLI (thin version)
-        run: |
-          curl -fL https://getcli.jfrog.io | sh
-          sudo mv jfrog /usr/local/bin/jf
+      # 3. Install and configure JFrog CLI (best practice)
+      - name: Setup JFrog CLI
+        uses: jfrog/setup-jfrog-cli@v4
+        env:
+          JF_URL: ${{ secrets.JF_URL }}
+          JF_USER: ${{ secrets.JF_USER }}
+          JF_PASSWORD: ${{ secrets.JF_PASSWORD }}
 
-      - name: Configure JFrog CLI
+      # 4. Configure Maven to resolve dependencies through JFrog
+      - name: Configure Maven for JFrog
         run: |
-          jf c add jfrog-server \
-            --url="${{ secrets.JF_URL }}" \
-            --user="${{ secrets.JF_USER }}" \
-            --password="${{ secrets.JF_PASSWORD }}" \
-            --interactive=false
+          jf mvn-config \
+            --server-id-resolve=artifactory-server \
+            --server-id-deploy=artifactory-server \
+            --repo-resolve-releases=maven-virtual \
+            --repo-resolve-snapshots=maven-virtual \
+            --repo-deploy-releases=libs-release-local \
+            --repo-deploy-snapshots=libs-snapshot-local \
+            --use-wrapper=false
 
-      - name: Export JFrog environment variables for Maven
+      # 5. Build project with Maven via JFrog (dependency resolution through Artifactory)
+      - name: Build with Maven via JFrog
         run: |
-          echo "JF_URL=${{ secrets.JF_URL }}" >> $GITHUB_ENV
-          echo "JF_USER=${{ secrets.JF_USER }}" >> $GITHUB_ENV
-          echo "JF_PASSWORD=${{ secrets.JF_PASSWORD }}" >> $GITHUB_ENV
+          jf mvn clean package \
+            --build-name=$JF_BUILD_NAME \
+            --build-number=$JF_BUILD_NUMBER
 
-      - name: Build with Maven (using JFrog virtual repo)
-        run: mvn clean package -s settings.xml
-
-      - name: Upload JAR to Artifactory
+      # 6. Publish build-info to Artifactory (required for Xray)
+      - name: Publish build-info
         run: |
-          jf rt upload "target/*.jar" \
-            "libs-release-local/spring-petclinic/${{ github.run_number }}/" \
-            --flat=true
+          jf rt build-publish $JF_BUILD_NAME $JF_BUILD_NUMBER
 
-      - name: Xray Scan the Artifact
+      # 7. Scan build with Xray (meets assignment requirement)
+      - name: Xray scan build
         run: |
-          jf xr scan \
-            "libs-release-local/spring-petclinic/${{ github.run_number }}/" \
-            --fail=false
+          jf rt build-scan $JF_BUILD_NAME $JF_BUILD_NUMBER --fail=false
