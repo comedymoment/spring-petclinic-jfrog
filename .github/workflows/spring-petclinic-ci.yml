@@ -68,12 +68,8 @@ jobs:
             --build-name=$JF_BUILD_NAME \
             --build-number=$JF_BUILD_NUMBER
 
-      # 7. Publish build-info to Artifactory (CRITICAL for Xray)
-      - name: Publish build-info
+      # 8. Security Scan
+      # unable to publish build metadata using jf rt build-publish
+      - name: Xray scan (work around)
         run: |
-          jf rt build-publish $JF_BUILD_NAME $JF_BUILD_NUMBER
-
-      # 8. Scan build with Xray
-      - name: Xray scan build
-        run: |
-          jf build-scan $JF_BUILD_NAME $JF_BUILD_NUMBER --fail=false
+          jf audit
