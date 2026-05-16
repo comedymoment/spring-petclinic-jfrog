@@ -51,13 +51,19 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
     </dependency>
 
-    <!-- ✅ FIX: Validation (needed for @NotBlank, @Valid) -->
+    <!-- ✅ FIX: Validation (@NotBlank / @Valid) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
 
-    <!-- ✅ FIX: JAXB (needed for XML annotations) -->
+    <!-- ✅ FIX: Cache support (JCacheManagerCustomizer) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-cache</artifactId>
+    </dependency>
+
+    <!-- ✅ FIX: JAXB (XML annotations) -->
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
@@ -105,40 +111,3 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>bootstrap</artifactId>
-      <version>${webjars-bootstrap.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.webjars.npm</groupId>
-      <artifactId>font-awesome</artifactId>
-      <version>${webjars-font-awesome.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-
-    <!-- ✅ Dev -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-devtools</artifactId>
-      <optional>true</optional>
-    </dependency>
-
-    <!-- ✅ Tests -->
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-  </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
-      </plugin>
-    </plugins>
-  </build>
-
-</project>
