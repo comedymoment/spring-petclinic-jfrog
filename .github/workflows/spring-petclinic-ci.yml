@@ -13,7 +13,7 @@ jobs:
       JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
 
       # JFrog repositories (adjust names if yours differ)
-      JF_MAVEN_VIRTUAL: maven-virtual
+      JF_MAVEN_VIRTUAL: uk1-maven-virtual
       JF_MAVEN_RELEASES: libs-release-local
       JF_MAVEN_SNAPSHOTS: libs-snapshot-local
 
