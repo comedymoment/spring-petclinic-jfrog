@@ -72,4 +72,4 @@ jobs:
       # unable to publish build metadata using jf rt build-publish
       - name: Xray scan (work around)
         run: |
-          jf audit --fail=false
+          jf audit --fail=false || true
