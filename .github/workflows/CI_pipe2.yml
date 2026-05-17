@@ -1,4 +1,4 @@
-name: spring-petclinic-ci
+name: CI_pipe2
 
 on:
   workflow_dispatch:
