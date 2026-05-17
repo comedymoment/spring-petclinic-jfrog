@@ -59,11 +59,10 @@ jobs:
             --repo-deploy-snapshots="$JF_MAVEN_SNAPSHOTS" \
             --use-wrapper=false
 
-      # 6. Resolve dependencies and build the artifact (JAR) via JFrog
-      #    This also attaches artifacts + dependencies to build-info
+      # 6. Resolve dependencies, build and deploy the artifact (JAR) to JFrog
       - name: Build with Maven via JFrog
         run: |
-          jf mvn clean package -Dmaven.test.skip=true \
+          jf mvn clean deploy -Dmaven.test.skip=true \
             --build-name=$JF_BUILD_NAME \
             --build-number=$JF_BUILD_NUMBER
 
