@@ -1,4 +1,4 @@
-name: CI with JFrog Artifactory and Xray
+name: CI_pipe1
 
 on:
   workflow_dispatch:
