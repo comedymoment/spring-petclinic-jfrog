@@ -16,7 +16,7 @@ jobs:
       JF_MAVEN_RELEASES: libs-release-local
       JF_MAVEN_SNAPSHOTS: libs-snapshot-local
 
-      # Build metadata for JFrog (used for traceability)
+      # Build metadata for JFrog
       JF_BUILD_NAME: spring-petclinic-ci
       JF_BUILD_NUMBER: ${{ github.run_number }}
 
@@ -38,7 +38,7 @@ jobs:
       - name: Install JFrog CLI
         uses: jfrog/setup-jfrog-cli@v4
 
-      # 4. Configure JFrog CLI with access token (best practice)
+      # 4. Configure JFrog CLI with access token
       - name: Configure JFrog CLI
         run: |
           jf c add my-server \
@@ -47,7 +47,7 @@ jobs:
             --interactive=false \
             --overwrite=true
             
-      # 5. Configure Maven to resolve ONLY through JFrog (virtual repo)
+      # 5. Configure Maven to resolve ONLY through JFrog
       - name: Configure Maven for JFrog
         run: |
           jf mvn-config \
@@ -67,7 +67,6 @@ jobs:
             --build-number=$JF_BUILD_NUMBER
 
       # 7. Security Scan
-      # unable to publish build metadata using jf rt build-publish
-      - name: Xray scan (work around)
+      - name: Xray scan
         run: |
           jf audit --fail=false || true
