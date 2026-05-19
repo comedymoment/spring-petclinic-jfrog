@@ -69,4 +69,5 @@ jobs:
       # 7. Security Scan
       - name: Xray scan
         run: |
-          jf audit --fail=false || true
+          jf rt build-publish
+          jf rt build-scan
