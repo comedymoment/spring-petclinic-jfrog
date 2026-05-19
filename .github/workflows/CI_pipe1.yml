@@ -69,5 +69,5 @@ jobs:
       # 7. Security Scan
       - name: Xray scan
         run: |
-          jf rt build-publish
-          jf rt build-scan
+          jf build-publish $JF_BUILD_NAME $JF_BUILD_NUMBER  
+          jf build-scan $JF_BUILD_NAME $JF_BUILD_NUMBER
