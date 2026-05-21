@@ -62,7 +62,7 @@ jobs:
       # 6. Resolve dependencies, build and deploy the artifact (JAR) to JFrog
       - name: Build with Maven via JFrog
         run: |
-          jf mvn clean deploy -Dmaven.test.skip=true \
+          jf mvn clean deploy \
             --build-name=$JF_BUILD_NAME \
             --build-number=$JF_BUILD_NUMBER
 
